@@ -6,14 +6,15 @@ MODEL = os.getenv(
     "qwen3:8b"
 )
 
-FILE_NAME = os.getenv(
-    "FILE_NAME",
-    "data/chat_history.json"
-)
+
 
 MAX_MESSAGES = int(
     os.getenv(
         "MAX_MESSAGES",
         20
     )
+)
+DATABASE=os.getenv(
+    "DATABASE",
+    "data/maestro.db"
 )

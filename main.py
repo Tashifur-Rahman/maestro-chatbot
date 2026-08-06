@@ -3,7 +3,7 @@ import ollama
 from config import *
 
 from memory import *
-create_database()
+from prompts import SYSTEM_PROMPT
 messages=load_memory()
 while True:
     user=input("You: ")

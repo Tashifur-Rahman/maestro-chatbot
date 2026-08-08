@@ -1,5 +1,5 @@
 import ollama
-
+from llm import generate_response
 from config import *
 
 from memory import *
@@ -23,11 +23,9 @@ while True:
          "content":user
          } )
     save_memory("user",user)
-    response=ollama.chat(
-        model=MODEL,
-        messages=messages[len(messages)-MAX_MESSAGES:]  # only send the last MAX_MESSAGES messages to the model
+    answer = generate_response(
+    messages[-MAX_MESSAGES:]
     )
-    answer=response["message"]["content"]
     messages.append(
         {"role":"assistant",
          "content":answer

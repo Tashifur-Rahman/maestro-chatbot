@@ -1,62 +1,63 @@
-import json
-import os
+from pymongo import MongoClient
+from bson import ObjectId
 
-from config import *
-import sqlite3
-
-from config import DATABASE
+from config import MONGO_URL, DATABASE_NAME, MONGO_URL
 
 
-def create_database():
+# Connect to MongoDB
+client = MongoClient(MONGO_URL)
 
-    connection = sqlite3.connect(DATABASE)
+db = client[DATABASE_NAME]
 
-    cursor = connection.cursor()
+conversations = db["conversations"]
 
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS messages(
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+def create_session(title):
+    conversation = {
+        "title": title,
+        "messages": []
+    }
 
-            role TEXT NOT NULL,
+    result = conversations.insert_one(conversation)
 
-            content TEXT NOT NULL
+    return str(result.inserted_id)
 
-        )
-        """
+
+def load_memory(session_id):
+    conversation = conversations.find_one(
+        {"_id": ObjectId(session_id)}
     )
 
-    connection.commit()
+    if conversation:
+        return conversation["messages"]
 
-    connection.close()
-
-
-def load_memory():
-    connection=sqlite3.connect(DATABASE)
-    cursor=connection.cursor()
-    cursor.execute("SELECT role,content FROM messages ORDER BY id ASC")
-    rows=cursor.fetchall()
-    connection.close()
-    messages=[]
-    for row in rows:
-        messages.append({"role":row[0],"content":row[1]})
-    return messages
+    return []
 
 
-def save_memory(role,content):
-    connection=sqlite3.connect(DATABASE)
-    cursor=connection.cursor()
-    cursor.execute("INSERT INTO messages (role,content) VALUES (?,?)",(role,content))
-    connection.commit()
-    connection.close()
+def save_memory(session_id, role, content):
+    conversations.update_one(
+        {"_id": ObjectId(session_id)},
+        {
+            "$push": {
+                "messages": {
+                    "role": role,
+                    "content": content
+                }
+            }
+        }
+    )
 
-def clear_memory():
-    connection=sqlite3.connect(DATABASE)
-    cursor=connection.cursor()
-    cursor.execute("DELETE FROM messages")
-    connection.commit()
-    connection.close()
+
+def clear_memory(session_id):
+    conversations.update_one(
+        {"_id": ObjectId(session_id)},
+        {
+            "$set": {
+                "messages": []
+            }
+        }
+    )
+
 
 def show_history(messages):
 
@@ -65,14 +66,11 @@ def show_history(messages):
     for msg in messages:
 
         if msg["role"] == "user":
-
             print(
                 f"\033[32mYou      : {msg['content']}\033[0m"
             )
 
         else:
-
             print(
                 f"\033[33mMaestro  : {msg['content']}\033[0m"
             )
-

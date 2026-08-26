@@ -6,7 +6,10 @@ MODEL = os.getenv(
     "qwen3:8b"
 )
 
-
+MONGO_URL = os.getenv(
+    "MONGO_URL")
+DATABASE_NAME = os.getenv(
+    "DATABASE_NAME")
 
 MAX_MESSAGES = int(
     os.getenv(

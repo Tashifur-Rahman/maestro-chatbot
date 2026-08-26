@@ -74,3 +74,11 @@ def show_history(messages):
             print(
                 f"\033[33mMaestro  : {msg['content']}\033[0m"
             )
+# get_sessions Gives all conversations, title:1 gives only the title of sessions.
+def get_sessions():
+    sessions=conversations.find({},{"title":1}).sort("_id",1)
+    return list(sessions)
+
+def delete_sessions(session_id):
+    conversations.delete_one({"_id": ObjectId(session_id)}) #objectId is used to convert the string session_id to an ObjectId for deletion.
+

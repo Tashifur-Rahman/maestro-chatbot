@@ -1,7 +1,12 @@
 import ollama
 from config import MODEL, MAX_MESSAGES
+from prompts import SYSTEM_PROMPT
 
 def generate_response(messages):
+    messages=[
+        {"role":"system",
+         "content":SYSTEM_PROMPT}
+    ]
     response=ollama.chat(
         model=MODEL,
         messages=messages,

@@ -53,7 +53,10 @@ while True:
          }
     )
     save_memory(current_session_id,"user",user) #add the user message to the database
-    answer=generate_response(messages[-MAX_MESSAGES:]) #get the last MAX_MESSAGES messages for context
+    answer = generate_response(
+    messages[-MAX_MESSAGES:],
+    SYSTEM_PROMPT
+) #get the last MAX_MESSAGES messages for context
     messages.append(
         {"role":"assistant",
          "content":answer
